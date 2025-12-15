@@ -33,7 +33,7 @@ const init = async () => {
   productList = await getData();
   const { cartData, totalPrice } = await getCartData();
   renderProductCards(productList);
-  renderCartList(cartData,totalPrice);
+  renderCartList(cartData, totalPrice);
 };
 
 const renderProductCards = (products) => {
@@ -84,7 +84,7 @@ const createCardHtml = (products) => {
 };
 const addCartItem = async (productId) => {
   try {
-    const {cartData} = await getCartData();
+    const { cartData } = await getCartData();
     const existItem = cartData.find((item) => item.product.id === productId);
     const quantity = existItem ? existItem.quantity + 1 : 1;
 
@@ -94,9 +94,9 @@ const addCartItem = async (productId) => {
         quantity: quantity,
       },
     });
-    let newCartData =res.data.carts;
-    let totalPrice= res.data.finalTotal;
-    renderCartList(newCartData,totalPrice);
+    let newCartData = res.data.carts;
+    let totalPrice = res.data.finalTotal;
+    renderCartList(newCartData, totalPrice);
   } catch (error) {
     console.log(error);
   }
@@ -104,7 +104,9 @@ const addCartItem = async (productId) => {
 const delCartItem = async (cartId) => {
   try {
     const res = await axios.delete(`${API_URL}/carts/${cartId}`);
-    renderCartList(res.data.carts);
+    let newCartData = res.data.carts;
+    let totalPrice = res.data.finalTotal;
+    renderCartList(newCartData, totalPrice);
   } catch (error) {
     console.log(error);
   }
@@ -112,7 +114,9 @@ const delCartItem = async (cartId) => {
 const delCartAllItem = async () => {
   try {
     const res = await axios.delete(`${API_URL}/carts`);
-    renderCartList(res.data.carts);
+    let newCartData = res.data.carts;
+    let totalPrice = res.data.finalTotal;
+    renderCartList(newCartData, totalPrice);
   } catch (error) {
     console.log(error);
   }

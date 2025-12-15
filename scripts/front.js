@@ -53,7 +53,9 @@ const createCartHtml = (items) => {
               <td>${item.quantity}</td>
               <td>NT$${item.product.price * item.quantity}</td>
               <td class="discardBtn">
-                <a href="#" class="material-icons"> clear </a>
+                <button type="button" class="material-icons delCartBtn" data-id=${
+                  item.product.id
+                } data-cart-id=${item.id}> clear </button>
               </td>
             </tr>`;
     })
@@ -93,6 +95,14 @@ const addCartItem = async (productId) => {
     console.log(error);
   }
 };
+const delCartItem = async (cartId) => {
+  try {
+    const res = await axios.delete(`${API_URL}/carts/${cartId}`);
+    renderCartList(res.data.carts);
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 productSelect.addEventListener("change", (e) => {
   let value = e.target.value;
@@ -106,5 +116,10 @@ productWrap.addEventListener("click", (e) => {
   if (!e.target.classList.contains("addCartBtn")) return;
   let productId = e.target.dataset.id;
   addCartItem(productId);
+});
+cartTableList.addEventListener("click", (e) => {
+  if (!e.target.classList.contains("delCartBtn")) return;
+  let cartId = e.target.dataset.cartId;
+  delCartItem(cartId);
 });
 init();

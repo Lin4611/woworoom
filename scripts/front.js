@@ -5,7 +5,8 @@ const API_URL =
 const productWrap = document.querySelector(".productWrap");
 const productSelect = document.querySelector(".productSelect");
 const cartTableList = document.querySelector(".shoppingCart-tableList");
-
+const discardAllBtn = document.querySelector(".discardAllBtn");
+const totalPriceText = document.querySelector(".total-price");
 const getData = async () => {
   try {
     const res = await axios.get(`${API_URL}/products`);
@@ -19,8 +20,10 @@ const getData = async () => {
 const getCartData = async () => {
   try {
     const res = await axios.get(`${API_URL}/carts`);
-    console.log(res.data.carts);
-    return res.data.carts;
+    return {
+      cartData: res.data.carts,
+      totalPrice: res.data.finalTotal,
+    };
   } catch (error) {
     console.log(error);
   }
@@ -28,16 +31,17 @@ const getCartData = async () => {
 
 const init = async () => {
   productList = await getData();
-  cartList = await getCartData();
+  const { cartData, totalPrice } = await getCartData();
   renderProductCards(productList);
-  renderCartList(cartList);
+  renderCartList(cartData,totalPrice);
 };
 
 const renderProductCards = (products) => {
   productWrap.innerHTML = createCardHtml(products);
 };
-const renderCartList = (items) => {
+const renderCartList = (items, totalPrice) => {
   cartTableList.innerHTML = createCartHtml(items);
+  totalPriceText.textContent = `NT$${totalPrice}`;
 };
 const createCartHtml = (items) => {
   return items
@@ -80,8 +84,8 @@ const createCardHtml = (products) => {
 };
 const addCartItem = async (productId) => {
   try {
-    const cartRes = await getCartData();
-    const existItem = cartRes.find((item) => item.product.id === productId);
+    const {cartData} = await getCartData();
+    const existItem = cartData.find((item) => item.product.id === productId);
     const quantity = existItem ? existItem.quantity + 1 : 1;
 
     const res = await axios.post(`${API_URL}/carts`, {
@@ -90,7 +94,9 @@ const addCartItem = async (productId) => {
         quantity: quantity,
       },
     });
-    renderCartList(res.data.carts);
+    let newCartData =res.data.carts;
+    let totalPrice= res.data.finalTotal;
+    renderCartList(newCartData,totalPrice);
   } catch (error) {
     console.log(error);
   }
@@ -98,6 +104,14 @@ const addCartItem = async (productId) => {
 const delCartItem = async (cartId) => {
   try {
     const res = await axios.delete(`${API_URL}/carts/${cartId}`);
+    renderCartList(res.data.carts);
+  } catch (error) {
+    console.log(error);
+  }
+};
+const delCartAllItem = async () => {
+  try {
+    const res = await axios.delete(`${API_URL}/carts`);
     renderCartList(res.data.carts);
   } catch (error) {
     console.log(error);
@@ -121,5 +135,8 @@ cartTableList.addEventListener("click", (e) => {
   if (!e.target.classList.contains("delCartBtn")) return;
   let cartId = e.target.dataset.cartId;
   delCartItem(cartId);
+});
+discardAllBtn.addEventListener("click", () => {
+  delCartAllItem();
 });
 init();

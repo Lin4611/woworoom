@@ -1,8 +1,10 @@
 let productList = [];
+let cartList = [];
 const API_URL =
   "https://livejs-api.hexschool.io/api/livejs/v1/customer/lin1215";
 const productWrap = document.querySelector(".productWrap");
 const productSelect = document.querySelector(".productSelect");
+const cartTableList = document.querySelector(".shoppingCart-tableList");
 const getData = async () => {
   try {
     const res = await axios.get(`${API_URL}/products`);
@@ -13,13 +15,46 @@ const getData = async () => {
   }
 };
 
+const getCartData = async () => {
+  try {
+    const res = await axios.get(`${API_URL}/carts`);
+    console.log(res.data.carts);
+    return res.data.carts;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 const init = async () => {
   productList = await getData();
+  cartList = await getCartData();
   renderProductCards(productList);
+  renderCartList(cartList);
 };
 
 const renderProductCards = (products) => {
   productWrap.innerHTML = createCardHtml(products);
+};
+const renderCartList = (items) => {
+  cartTableList.innerHTML = createCartHtml(items);
+};
+const createCartHtml = (items) => {
+  return items.map((item) => {
+    return `<tr>
+              <td>
+                <div class="cardItem-title">
+                  <img src=${item.product.images} alt=${item.product.title} />
+                  <p>${item.product.title}</p>
+                </div>
+              </td>
+              <td>NT$${item.product.price}</td>
+              <td>${item.quantity}</td>
+              <td>NT$${item.product.price * item.quantity}</td>
+              <td class="discardBtn">
+                <a href="#" class="material-icons"> clear </a>
+              </td>
+            </tr>`;
+  });
 };
 const createCardHtml = (products) => {
   return products

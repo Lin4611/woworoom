@@ -2,7 +2,7 @@ let productList = [];
 const API_URL =
   "https://livejs-api.hexschool.io/api/livejs/v1/customer/lin1215";
 const productWrap = document.querySelector(".productWrap");
-
+const productSelect = document.querySelector(".productSelect");
 const getData = async () => {
   try {
     const res = await axios.get(`${API_URL}/products`);
@@ -39,3 +39,12 @@ const createCardHtml = (products) => {
     .join("");
 };
 init();
+
+productSelect.addEventListener("change", (e) => {
+  let value = e.target.value;
+  let filteredData =
+    value === "全部"
+      ? productList
+      : productList.filter((product) => product.category === value);
+  renderProductCards(filteredData);
+});

@@ -548,7 +548,8 @@ body {
      object-fit: cover;
 }
 
-.productCard a {
+.productCard button {
+  width: 100%;
   display: block;
   background-color: #000000;
   color: #ffffff;
@@ -559,11 +560,11 @@ body {
   text-decoration: none;
 }
 
-.productCard a:hover {
+.productCard button:hover {
   background-color: #301E5F;
 }
 
-.productCard a, .productCard h3 {
+.productCard button, .productCard h3 {
   font-size: 1.25rem;
 }
 
@@ -616,13 +617,13 @@ body {
   text-align: left;
 }
 
-.shoppingCart-table tr {
+.shoppingCart-table tbody tr {
   border-bottom: 1px solid #B9B9B9;
 }
 
-.shoppingCart-table tr:first-child, .shoppingCart-table tr:last-child {
+/* .shoppingCart-table tbody tr:first-child, .shoppingCart-table tbody tr:last-child {
   border-bottom: 0;
-}
+} */
 
 @media (max-width: 767px) {
   .shoppingCart-table {

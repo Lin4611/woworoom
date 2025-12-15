@@ -5,6 +5,7 @@ const API_URL =
 const productWrap = document.querySelector(".productWrap");
 const productSelect = document.querySelector(".productSelect");
 const cartTableList = document.querySelector(".shoppingCart-tableList");
+
 const getData = async () => {
   try {
     const res = await axios.get(`${API_URL}/products`);
@@ -39,8 +40,9 @@ const renderCartList = (items) => {
   cartTableList.innerHTML = createCartHtml(items);
 };
 const createCartHtml = (items) => {
-  return items.map((item) => {
-    return `<tr>
+  return items
+    .map((item) => {
+      return `<tr>
               <td>
                 <div class="cardItem-title">
                   <img src=${item.product.images} alt=${item.product.title} />
@@ -54,7 +56,8 @@ const createCartHtml = (items) => {
                 <a href="#" class="material-icons"> clear </a>
               </td>
             </tr>`;
-  });
+    })
+    .join("");
 };
 const createCardHtml = (products) => {
   return products
@@ -65,7 +68,7 @@ const createCardHtml = (products) => {
             src=${product.images}
             alt=${product.title}
           />
-          <a href="#" class="addCardBtn">加入購物車</a>
+          <button type="button" class="addCartBtn" data-id=${product.id}>加入購物車</button>
           <h3>${product.title}</h3>
           <del class="originPrice">NT$${product.origin_price}</del>
           <p class="nowPrice">NT$${product.price}</p>
@@ -73,7 +76,23 @@ const createCardHtml = (products) => {
     })
     .join("");
 };
-init();
+const addCartItem = async (productId) => {
+  try {
+    const cartRes = await getCartData();
+    const existItem = cartRes.find((item) => item.product.id === productId);
+    const quantity = existItem ? existItem.quantity + 1 : 1;
+
+    const res = await axios.post(`${API_URL}/carts`, {
+      data: {
+        productId: productId,
+        quantity: quantity,
+      },
+    });
+    renderCartList(res.data.carts);
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 productSelect.addEventListener("change", (e) => {
   let value = e.target.value;
@@ -83,3 +102,9 @@ productSelect.addEventListener("change", (e) => {
       : productList.filter((product) => product.category === value);
   renderProductCards(filteredData);
 });
+productWrap.addEventListener("click", (e) => {
+  if (!e.target.classList.contains("addCartBtn")) return;
+  let productId = e.target.dataset.id;
+  addCartItem(productId);
+});
+init();

@@ -1,5 +1,6 @@
 let orderList = [];
 const orderTable = document.querySelector(".orderPage-table tbody");
+const delAllOrderBtn = document.querySelector(".discardAllBtn");
 const API_URL = "https://livejs-api.hexschool.io/api/livejs/v1/admin/lin1215";
 const API_TOKEN = "dSQdka36NlOq62YaZcQkez0LVHi1";
 const getOrderData = async () => {
@@ -78,9 +79,25 @@ const delOrderItem = async (orderId) => {
     console.log(error);
   }
 };
+const delAllOrderItem = async () => {
+  try {
+    const res = await axios.delete(`${API_URL}/orders`, {
+      headers: {
+        Authorization: API_TOKEN,
+      },
+    });
+    let newOrderData = res.data.orders;
+    renderOrderTable(newOrderData);
+  } catch (error) {
+    console.log(error);
+  }
+};
 orderTable.addEventListener("click", (e) => {
   if (!e.target.classList.contains("delSingleOrder-Btn")) return;
   let orderId = e.target.dataset.orderId;
   delOrderItem(orderId);
+});
+delAllOrderBtn.addEventListener("click", () => {
+  delAllOrderItem();
 });
 init();

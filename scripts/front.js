@@ -66,7 +66,25 @@ const renderProductCards = (products) => {
   productWrap.innerHTML = createCardHtml(products);
 };
 const renderCartList = (items, totalPrice) => {
-  cartTableList.innerHTML = createCartHtml(items);
+  const tableHead = document.querySelector(".shoppingCart-table thead");
+  const tableFoot = document.querySelector(".shoppingCart-table tfoot");
+
+  if (items.length === 0) {
+    tableHead.style.display = "none";
+    tableFoot.style.display = "none";
+    cartTableList.innerHTML = `
+      <tr>
+        <td class='empty-state-table'>
+          <span class="material-icons cart-icon">shopping_cart_checkout</span>
+          <p>目前購物車沒有品項，快去選購吧！</p>
+        </td>
+      </tr>
+    `;
+  } else {
+    tableHead.style.display = "";
+    tableFoot.style.display = "";
+    cartTableList.innerHTML = createCartHtml(items);
+  }
   totalPriceText.textContent = `NT$${totalPrice}`;
 };
 const createCartHtml = (items) => {

@@ -7,6 +7,32 @@ const productSelect = document.querySelector(".productSelect");
 const cartTableList = document.querySelector(".shoppingCart-tableList");
 const discardAllBtn = document.querySelector(".discardAllBtn");
 const totalPriceText = document.querySelector(".total-price");
+const orderForm = document.querySelector(".orderInfo-form");
+const checkoutEl = {
+  name: document.getElementById("customerName"),
+  tel: document.getElementById("customerPhone"),
+  email: document.getElementById("customerEmail"),
+  address: document.getElementById("customerAddress"),
+  payment: document.getElementById("tradeWay"),
+};
+const requiredFields = [
+  {
+    input: checkoutEl.name,
+    message: document.querySelector('[data-message="姓名"]'),
+  },
+  {
+    input: checkoutEl.tel,
+    message: document.querySelector('[data-message="電話"]'),
+  },
+  {
+    input: checkoutEl.email,
+    message: document.querySelector('[data-message="Email"]'),
+  },
+  {
+    input: checkoutEl.address,
+    message: document.querySelector('[data-message="寄送地址"]'),
+  },
+];
 const getData = async () => {
   try {
     const res = await axios.get(`${API_URL}/products`);
@@ -121,7 +147,46 @@ const delCartAllItem = async () => {
     console.log(error);
   }
 };
+const validCheckoutInputs = () => {
+  let isValid = true;
 
+  requiredFields.forEach(({ input, message }) => {
+    if (!input.value.trim()) {
+      isValid = false;
+      message.classList.add("active");
+      input.classList.add("error");
+    } else {
+      message.classList.remove("active");
+      input.classList.remove("error");
+    }
+  });
+
+  return isValid;
+};
+
+const sendCheckout = async () => {
+  let checkoutData = {
+    name: checkoutEl.name.value.trim(),
+    tel: checkoutEl.tel.value.trim(),
+    email: checkoutEl.email.value.trim(),
+    address: checkoutEl.address.value.trim(),
+    payment: checkoutEl.payment.value,
+  };
+  try {
+    const res = await axios.post(`${API_URL}/orders`, {
+      data: {
+        user: checkoutData,
+      },
+    });
+    alert("成功送出");
+    orderForm.reset();
+    const { cartData, totalPrice } = await getCartData();
+    renderCartList(cartData, totalPrice);
+    return res.data.user;
+  } catch (error) {
+    console.log(error);
+  }
+};
 productSelect.addEventListener("change", (e) => {
   let value = e.target.value;
   let filteredData =
@@ -142,5 +207,14 @@ cartTableList.addEventListener("click", (e) => {
 });
 discardAllBtn.addEventListener("click", () => {
   delCartAllItem();
+});
+orderForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const isFormValid = validCheckoutInputs();
+  if (isFormValid) {
+    sendCheckout();
+  } else {
+    return;
+  }
 });
 init();

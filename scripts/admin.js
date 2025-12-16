@@ -32,9 +32,9 @@ const renderOrderTable = (orderData) => {
 const createProductsHtml = (products) => {
   return products
     .map((product) => {
-      return `<p>${product.title} (${product.quantity})</p>`;
+      return `<p>${product.title} * ${product.quantity}</p>`;
     })
-    .join("");
+    .join(" ");
 };
 
 const createTableHtml = (orderData) => {

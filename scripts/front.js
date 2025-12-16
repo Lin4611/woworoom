@@ -213,10 +213,16 @@ productSelect.addEventListener("change", (e) => {
       : productList.filter((product) => product.category === value);
   renderProductCards(filteredData);
 });
-productWrap.addEventListener("click", (e) => {
+productWrap.addEventListener("click",async (e) => {
   if (!e.target.classList.contains("addCartBtn")) return;
+  const addBtn = e.target;
   let productId = e.target.dataset.id;
-  addCartItem(productId);
+  addBtn.disabled=true;
+  addBtn.textContent='加入中...';
+  await addCartItem(productId);
+  addBtn.disabled = false;
+  addBtn.textContent ='加入購物車';
+  alert('加入成功')
 });
 cartTableList.addEventListener("click", (e) => {
   if (!e.target.classList.contains("delCartBtn")) return;

@@ -695,7 +695,14 @@ body {
   background-color: #f8f8f8;
   padding: 60px 0;
 }
-
+.empty-state-table {
+  text-align: center;
+  color: "#666";
+}
+.cart-icon {
+  font-size: 48px;
+  margin-bottom: 10px;
+}
 .shoppingCart-table {
   margin: 0 auto;
   border-collapse: collapse;

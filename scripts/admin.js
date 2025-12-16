@@ -57,10 +57,30 @@ const createTableHtml = (orderData) => {
                 <a href="#">${item.paid ? "已處理" : "未處理"}</a>
               </td>
               <td>
-                <input type="button" class="delSingleOrder-Btn" value="刪除" />
+                <input type="button" class="delSingleOrder-Btn" data-order-id=${
+                  item.id
+                } value="刪除" />
               </td>
             </tr>`;
     })
     .join("");
 };
+const delOrderItem = async (orderId) => {
+  try {
+    const res = await axios.delete(`${API_URL}/orders/${orderId}`, {
+      headers: {
+        Authorization: API_TOKEN,
+      },
+    });
+    let newOrderData = res.data.orders;
+    renderOrderTable(newOrderData);
+  } catch (error) {
+    console.log(error);
+  }
+};
+orderTable.addEventListener("click", (e) => {
+  if (!e.target.classList.contains("delSingleOrder-Btn")) return;
+  let orderId = e.target.dataset.orderId;
+  delOrderItem(orderId);
+});
 init();

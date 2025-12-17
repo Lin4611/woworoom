@@ -165,11 +165,37 @@ const delCartAllItem = async () => {
     console.log(error);
   }
 };
+const validatePhone = (phone) => {
+  const re = /^09\d{8}$/;
+  return re.test(phone);
+};
+const validateEmail = (email) => {
+  const re =
+    /^\w+((-\w+)|(\.\w+))*\@[A-Za-z0-9]+((\.|-)[A-Za-z0-9]+)*\.[A-Za-z]+$/;
+  return re.test(email);
+};
 const validCheckoutInputs = () => {
   let isValid = true;
 
   requiredFields.forEach(({ input, message }) => {
-    if (!input.value.trim()) {
+    let isFormValid = true;
+    const value = input.value.trim();
+    if (!value) {
+      isValid = false;
+      message.textContent = "必填";
+      message.classList.add("active");
+      input.classList.add("error");
+      return;
+    }
+
+    if (input.name === "Email" && !validateEmail(value)) {
+      isFormValid = false;
+      message.textContent = "Email格式錯誤";
+    } else if (input.name === "電話" && !validatePhone(value)) {
+      isFormValid = false;
+      message.textContent = "電話格式錯誤 (需為 09 開頭共 10 碼)";
+    }
+    if (!isFormValid) {
       isValid = false;
       message.classList.add("active");
       input.classList.add("error");
@@ -213,16 +239,16 @@ productSelect.addEventListener("change", (e) => {
       : productList.filter((product) => product.category === value);
   renderProductCards(filteredData);
 });
-productWrap.addEventListener("click",async (e) => {
+productWrap.addEventListener("click", async (e) => {
   if (!e.target.classList.contains("addCartBtn")) return;
   const addBtn = e.target;
   let productId = e.target.dataset.id;
-  addBtn.disabled=true;
-  addBtn.textContent='加入中...';
+  addBtn.disabled = true;
+  addBtn.textContent = "加入中...";
   await addCartItem(productId);
   addBtn.disabled = false;
-  addBtn.textContent ='加入購物車';
-  alert('加入成功')
+  addBtn.textContent = "加入購物車";
+  alert("加入成功");
 });
 cartTableList.addEventListener("click", (e) => {
   if (!e.target.classList.contains("delCartBtn")) return;

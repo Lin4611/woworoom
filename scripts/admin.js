@@ -106,6 +106,13 @@ const delOrderItem = async (orderId) => {
   }
 };
 const delAllOrderItem = async () => {
+  if (orderList.length === 0) {
+    alert("目前沒有訂單資料！");
+    return;
+  }
+  if (!confirm("確定要清空表單嗎？")) {
+    return;
+  }
   try {
     const res = await axios.delete(`${API_URL}/orders`, {
       headers: {

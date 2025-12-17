@@ -769,6 +769,7 @@ body {
 }
 
 .discardAllBtn:hover {
+  cursor: pointer;
   background-color: #000000;
   color: #ffffff;
 }
@@ -891,7 +892,7 @@ body {
   padding: 10px;
   display: block;
   color: #0067ce;
-  font-size:16px;
+  font-size: 16px;
   text-decoration: underline;
   background-color: transparent;
   border: none;

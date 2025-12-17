@@ -21,8 +21,14 @@ const getOrderData = async () => {
 const init = async () => {
   orderList = await getOrderData();
   const chartData = countC3Data(orderList);
-  renderChart(chartData);
+  const sortChartData = sortC3Data(chartData);
+  renderChart(sortChartData);
   renderOrderTable(orderList);
+};
+
+const sortC3Data = (chartData) => {
+  const sortChartData = [...chartData].sort((a, b) => b[1] - a[1]);
+  return sortChartData;
 };
 const transformDate = (timeStamp) => {
   return new Date(timeStamp * 1000).toLocaleDateString();
@@ -33,6 +39,7 @@ const renderOrderTable = (orderData) => {
     orderTable.innerHTML = `
       <tr>
         <td colspan="8" class='empty-order'>
+          <span class="material-icons order-icon">assignment</span>
           <p>目前沒有訂單資料</p>
         </td>
       </tr>`;
@@ -67,7 +74,11 @@ const createTableHtml = (orderData) => {
               </td>
               <td>${transformDate(item.createdAt)}</td>
               <td class="orderStatus">
-                <a href="#">${item.paid ? "已處理" : "未處理"}</a>
+                <button type="button" data-order-id=${item.id}
+                data-status="${item.paid}"
+                class="changeStatus-Btn">
+                  ${item.paid ? "已付款" : "未處理"}
+                </button>
               </td>
               <td>
                 <input type="button" class="delSingleOrder-Btn" data-order-id=${
@@ -87,8 +98,10 @@ const delOrderItem = async (orderId) => {
     });
     let newOrderData = res.data.orders;
     renderOrderTable(newOrderData);
-    const chartData = countC3Data(newOrderData);
-    renderChart(chartData);
+    const chartData = countC3Data(orderList);
+    const sortChartData = sortC3Data(chartData);
+    renderChart(sortChartData);
+    renderOrderTable(orderList);
   } catch (error) {
     console.log(error);
   }
@@ -101,8 +114,10 @@ const delAllOrderItem = async () => {
       },
     });
     let newOrderData = res.data.orders;
-    const chartData = countC3Data(newOrderData);
-    renderChart(chartData);
+    const chartData = countC3Data(orderList);
+    const sortChartData = sortC3Data(chartData);
+    renderChart(sortChartData);
+    renderOrderTable(orderList);
     renderOrderTable(newOrderData);
   } catch (error) {
     console.log(error);
@@ -125,17 +140,32 @@ const renderChart = (chartData) => {
       chart = null;
     }
     document.querySelector("#chart").innerHTML = `
-      <p>
-        目前無訂單資料，無法顯示圖表
-      </p>`;
+      <div class="empty-chart">
+        <span class="material-icons chart-icon">pie_chart</span>
+        <p>目前無訂單資料，無法顯示圖表</p>
+      </div>`;
     return;
   }
+  const colorPattern = [
+    "#301E5F",
+    "#5434A7",
+    "#9D7FEA",
+    "#C4B5FD",
+    "#DACBFF",
+    "#E9D5FF",
+    "#F3E8FF",
+    "#FAF5FF",
+  ];
+
   if (!chart) {
     chart = c3.generate({
       bindto: "#chart", // HTML 元素綁定
       data: {
         type: "pie",
         columns: chartData,
+      },
+      color: {
+        pattern: colorPattern,
       },
     });
   } else {
@@ -145,10 +175,45 @@ const renderChart = (chartData) => {
     });
   }
 };
+const updateStatus = async (orderId, paidStatus) => {
+  if (!confirm("是否要更改訂單狀態？")) {
+    return;
+  }
+  try {
+    const res = await axios.put(
+      `${API_URL}/orders`,
+      {
+        data: {
+          id: orderId,
+          paid: !paidStatus,
+        },
+      },
+      {
+        headers: {
+          Authorization: API_TOKEN,
+        },
+      }
+    );
+
+    let newOrderData = res.data.orders;
+    renderOrderTable(newOrderData);
+    alert("訂單狀態修改成功！");
+  } catch (error) {
+    console.log(error);
+  }
+};
 orderTable.addEventListener("click", (e) => {
-  if (!e.target.classList.contains("delSingleOrder-Btn")) return;
-  let orderId = e.target.dataset.orderId;
-  delOrderItem(orderId);
+  const target = e.target;
+  const orderId = target.dataset.orderId;
+  if (target.classList.contains("delSingleOrder-Btn")) {
+    delOrderItem(orderId);
+    return;
+  }
+  if (target.classList.contains("changeStatus-Btn")) {
+    let statusString = target.dataset.status;
+    let currentStatus = statusString === "true";
+    updateStatus(orderId, currentStatus);
+  }
 });
 delAllOrderBtn.addEventListener("click", () => {
   delAllOrderItem();

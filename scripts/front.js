@@ -143,6 +143,7 @@ const addCartItem = async (productId) => {
     renderCartList(newCartData, totalPrice);
   } catch (error) {
     console.log(error);
+    alert('新增至購物車失敗！')
   }
 };
 const delCartItem = async (cartId) => {
@@ -153,16 +154,23 @@ const delCartItem = async (cartId) => {
     renderCartList(newCartData, totalPrice);
   } catch (error) {
     console.log(error);
+    alert('刪除品項失敗！');
   }
 };
 const delCartAllItem = async () => {
+  if (!confirm("確定要清空購物車嗎？")) {
+    return;
+  }
   try {
     const res = await axios.delete(`${API_URL}/carts`);
     let newCartData = res.data.carts;
     let totalPrice = res.data.finalTotal;
     renderCartList(newCartData, totalPrice);
+
+    alert('購物車已清空！')
   } catch (error) {
     console.log(error);
+    alert("刪除失敗，請稍後再試");
   }
 };
 const validatePhone = (phone) => {
@@ -222,13 +230,14 @@ const sendCheckout = async () => {
         user: checkoutData,
       },
     });
-    alert("成功送出");
+    alert("成功送出！");
     orderForm.reset();
     const { cartData, totalPrice } = await getCartData();
     renderCartList(cartData, totalPrice);
     return res.data.user;
   } catch (error) {
     console.log(error);
+    alert('送出失敗！')
   }
 };
 productSelect.addEventListener("change", (e) => {

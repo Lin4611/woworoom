@@ -98,10 +98,9 @@ const delOrderItem = async (orderId) => {
     });
     let newOrderData = res.data.orders;
     renderOrderTable(newOrderData);
-    const chartData = countC3Data(orderList);
+    const chartData = countC3Data(newOrderData);
     const sortChartData = sortC3Data(chartData);
     renderChart(sortChartData);
-    renderOrderTable(orderList);
   } catch (error) {
     console.log(error);
   }
@@ -114,11 +113,10 @@ const delAllOrderItem = async () => {
       },
     });
     let newOrderData = res.data.orders;
-    const chartData = countC3Data(orderList);
+    renderOrderTable(newOrderData);
+    const chartData = countC3Data(newOrderData);
     const sortChartData = sortC3Data(chartData);
     renderChart(sortChartData);
-    renderOrderTable(orderList);
-    renderOrderTable(newOrderData);
   } catch (error) {
     console.log(error);
   }

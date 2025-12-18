@@ -20,14 +20,6 @@ const getOrderData = async () => {
 
 const init = async () => {
   const res = await getOrderData();
-  if (!res) {
-    alert("驗證失敗：Token 錯誤，請重新登入");
-    window.location.href = "/index.html";
-    return;
-  } else {
-    alert("歡迎您，管理員!");
-  }
-
   orderList = res;
   const chartData = countC3Data(orderList);
   const sortChartData = sortC3Data(chartData);
@@ -233,12 +225,13 @@ delAllOrderBtn.addEventListener("click", () => {
   delAllOrderItem();
 });
 const checkAuth = () => {
-  const tokenInput = prompt("請輸入API Token 進行身分驗證");
-  if (tokenInput && tokenInput.trim() !== "") {
-    API_TOKEN = tokenInput.trim();
+  const pwd = prompt("請輸入 PIN 碼進行身分驗證");
+  if (pwd === "1141218") {
+    alert("歡迎您，管理員!");
+    API_TOKEN = "dSQdka36NlOq62YaZcQkez0LVHi1";
     init();
   } else {
-    alert("未輸入 API Token，無法進入後台頁面");
+    alert("PIN 碼錯誤");
     window.location.href = "/index.html";
   }
 };

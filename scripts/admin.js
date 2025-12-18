@@ -3,7 +3,7 @@ let chart = null;
 const orderTable = document.querySelector(".orderPage-table tbody");
 const delAllOrderBtn = document.querySelector(".discardAllBtn");
 const API_URL = "https://livejs-api.hexschool.io/api/livejs/v1/admin/lin1215";
-const API_TOKEN = "dSQdka36NlOq62YaZcQkez0LVHi1";
+let API_TOKEN = "";
 const getOrderData = async () => {
   try {
     const res = await axios.get(`${API_URL}/orders`, {
@@ -19,7 +19,16 @@ const getOrderData = async () => {
 };
 
 const init = async () => {
-  orderList = await getOrderData();
+  const res = await getOrderData();
+  if (!res) {
+    alert("驗證失敗：Token 錯誤，請重新登入");
+    window.location.href = "/index.html";
+    return;
+  } else {
+    alert("歡迎您，管理員!");
+  }
+
+  orderList = res;
   const chartData = countC3Data(orderList);
   const sortChartData = sortC3Data(chartData);
   renderChart(sortChartData);
@@ -223,4 +232,14 @@ orderTable.addEventListener("click", (e) => {
 delAllOrderBtn.addEventListener("click", () => {
   delAllOrderItem();
 });
-init();
+const checkAuth = () => {
+  const tokenInput = prompt("請輸入API Token 進行身分驗證");
+  if (tokenInput && tokenInput.trim() !== "") {
+    API_TOKEN = tokenInput.trim();
+    init();
+  } else {
+    alert("未輸入 API Token，無法進入後台頁面");
+    window.location.href = "/index.html";
+  }
+};
+checkAuth();

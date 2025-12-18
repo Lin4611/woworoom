@@ -1,5 +1,6 @@
 let productList = [];
 let cartList = [];
+let totalPrice = 0;
 const API_URL =
   "https://livejs-api.hexschool.io/api/livejs/v1/customer/lin1215";
 const productWrap = document.querySelector(".productWrap");
@@ -46,10 +47,7 @@ const getData = async () => {
 const getCartData = async () => {
   try {
     const res = await axios.get(`${API_URL}/carts`);
-    return {
-      cartData: res.data.carts,
-      totalPrice: res.data.finalTotal,
-    };
+    return res.data;
   } catch (error) {
     console.log(error);
   }
@@ -57,9 +55,11 @@ const getCartData = async () => {
 
 const init = async () => {
   productList = await getData();
-  const { cartData, totalPrice } = await getCartData();
+  const cartInfo = await getCartData();
+  cartList = cartInfo.carts;
+  totalPrice = cartInfo.finalTotal;
   renderProductCards(productList);
-  renderCartList(cartData, totalPrice);
+  renderCartList(cartList, totalPrice);
 };
 
 const renderProductCards = (products) => {
@@ -128,8 +128,7 @@ const createCardHtml = (products) => {
 };
 const addCartItem = async (productId) => {
   try {
-    const { cartData } = await getCartData();
-    const existItem = cartData.find((item) => item.product.id === productId);
+    const existItem = cartList.find((item) => item.product.id === productId);
     const quantity = existItem ? existItem.quantity + 1 : 1;
 
     const res = await axios.post(`${API_URL}/carts`, {
@@ -138,23 +137,23 @@ const addCartItem = async (productId) => {
         quantity: quantity,
       },
     });
-    let newCartData = res.data.carts;
-    let totalPrice = res.data.finalTotal;
-    renderCartList(newCartData, totalPrice);
+    cartList = res.data.carts;
+    totalPrice = res.data.finalTotal;
+    renderCartList(cartList, totalPrice);
   } catch (error) {
     console.log(error);
-    alert('新增至購物車失敗！')
+    alert("新增至購物車失敗！");
   }
 };
 const delCartItem = async (cartId) => {
   try {
     const res = await axios.delete(`${API_URL}/carts/${cartId}`);
-    let newCartData = res.data.carts;
-    let totalPrice = res.data.finalTotal;
-    renderCartList(newCartData, totalPrice);
+    cartList = res.data.carts;
+    totalPrice = res.data.finalTotal;
+    renderCartList(cartList, totalPrice);
   } catch (error) {
     console.log(error);
-    alert('刪除品項失敗！');
+    alert("刪除品項失敗！");
   }
 };
 const delCartAllItem = async () => {
@@ -163,11 +162,11 @@ const delCartAllItem = async () => {
   }
   try {
     const res = await axios.delete(`${API_URL}/carts`);
-    let newCartData = res.data.carts;
-    let totalPrice = res.data.finalTotal;
-    renderCartList(newCartData, totalPrice);
+    cartList = res.data.carts;
+    totalPrice = res.data.finalTotal;
+    renderCartList(cartList, totalPrice);
 
-    alert('購物車已清空！')
+    alert("購物車已清空！");
   } catch (error) {
     console.log(error);
     alert("刪除失敗，請稍後再試");
@@ -232,12 +231,14 @@ const sendCheckout = async () => {
     });
     alert("成功送出！");
     orderForm.reset();
-    const { cartData, totalPrice } = await getCartData();
-    renderCartList(cartData, totalPrice);
+    const cartInfo = await getCartData();
+    cartList = cartInfo.carts;
+    totalPrice = cartInfo.finalTotal;
+    renderCartList(cartList, totalPrice);
     return res.data.user;
   } catch (error) {
     console.log(error);
-    alert('送出失敗！')
+    alert("送出失敗！");
   }
 };
 productSelect.addEventListener("change", (e) => {

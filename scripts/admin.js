@@ -96,9 +96,9 @@ const delOrderItem = async (orderId) => {
         Authorization: API_TOKEN,
       },
     });
-    let newOrderData = res.data.orders;
-    renderOrderTable(newOrderData);
-    const chartData = countC3Data(newOrderData);
+    orderList = res.data.orders;
+    renderOrderTable(orderList);
+    const chartData = countC3Data(orderList);
     const sortChartData = sortC3Data(chartData);
     renderChart(sortChartData);
   } catch (error) {
@@ -119,9 +119,9 @@ const delAllOrderItem = async () => {
         Authorization: API_TOKEN,
       },
     });
-    let newOrderData = res.data.orders;
-    renderOrderTable(newOrderData);
-    const chartData = countC3Data(newOrderData);
+    orderList = res.data.orders;
+    renderOrderTable(orderList);
+    const chartData = countC3Data(orderList);
     const sortChartData = sortC3Data(chartData);
     renderChart(sortChartData);
   } catch (error) {
